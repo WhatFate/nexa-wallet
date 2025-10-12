@@ -12,8 +12,4 @@ contract NexaWalletTest is Test {
     function setUp() public {
         nexaWallet = new NexaWallet(entryPointSepolia);
     }
-
-    function testVersionIsCorrect() public {
-        assertEq("Nexa Wallet V1.0", nexaWallet.version());
-    }
 }

@@ -10,7 +10,7 @@ contract DeployNexaWallet is Script {
 
     function run() public {
         vm.startBroadcast();
-        NexaWallet nexaWallet = new NexaWallet(entryPointSepolia);
+        new NexaWallet(entryPointSepolia);
         vm.stopBroadcast();
     }
 }

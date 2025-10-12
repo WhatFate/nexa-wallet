@@ -15,8 +15,12 @@ export default function Home() {
       </div>
 
       <div className="flex space-x-6">
-        <button className="button-log-in cursor-pointer">Log in</button>
-        <button className="button-sign-up cursor-pointer">Sign up</button>
+        <Link href="/login" className="button-log-in cursor-pointer">
+          Log in
+        </Link>
+        <Link href="/signup" className="button-sign-up cursor-pointer">
+          Sign up
+        </Link>
       </div>
 
       <footer className="absolute bottom-6 right-6 text-gray-500 text-sm">
