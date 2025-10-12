@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
@@ -24,18 +24,18 @@ export default function Home() {
       </footer>
 
       <div className="absolute top-180 left-6 flex flex-col space-y-4">
-        <a
-          href="#faq"
+        <Link
+          href="/faq"
           className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-xl shadow-md text-center transform transition duration-300 hover:scale-105 cursor-pointer"
         >
           FAQ
-        </a>
-        <a
-          href="#docs"
+        </Link>
+        <Link
+          href="/docs"
           className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-xl shadow-md text-center transform transition duration-300 hover:scale-105 cursor-pointer"
         >
           Docs
-        </a>
+        </Link>
         <a
           href="https://github.com/WhatFate/nexa-wallet"
           target="_blank"
