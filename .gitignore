@@ -10,7 +10,6 @@ dist/
 build/
 .cache/
 
-
 out/
 cache/
 
@@ -21,3 +20,5 @@ artifacts/
 .DS_Store
 Thumbs.db
 frontend/.next/
+frontend/src/tests
+backend/tests

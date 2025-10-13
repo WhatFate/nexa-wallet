@@ -20,10 +20,8 @@ export default function LogIn() {
 
     setLoading(true);
     try {
-      // Эмулируем запрос к API / проверку кошелька
       await new Promise((r) => setTimeout(r, 1500));
 
-      // Можно будет заменить на настоящую проверку
       setMessage(`✅ Welcome back, "${walletName}"!`);
     } catch (err) {
       console.error(err);
@@ -97,7 +95,6 @@ export default function LogIn() {
         Built at ETHOnline 2025
       </footer>
 
-      {/* AI Chat Widget */}
       <div className="absolute bottom-24 right-6 flex flex-col items-end space-y-2">
         {!isOpen && (
           <button

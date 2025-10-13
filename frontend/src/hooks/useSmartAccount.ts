@@ -24,17 +24,24 @@ export const useSmartAccount = (): UseSmartAccountState => {
     try {
       setError(undefined);
 
-      const provider = getProvider();
-      const owner = getDevSigner();
+      const res = await fetch("http://localhost:5000/api/get-env");
+      if (!res.ok) throw new Error("Failed to fetch env from backend");
+      const envData = await res.json();
+
+      const entryPointAddress = envData.entry_point;
+      if (!entryPointAddress) throw new Error("Entry point address not provided by backend");
+
+      const provider = await getProvider();
+      const owner = await getDevSigner();
 
       const account = new SimpleAccountAPI({
         provider,
         owner,
-        entryPointAddress: import.meta.env.VITE_ENTRYPOINT_ADDRESS!,
+        entryPointAddress,
       });
 
       await account.init();
-      const addr = await account.getAccountAddress();;
+      const addr = await account.getAccountAddress();
 
       setWalletAPI(account);
       setAddress(addr);
@@ -51,7 +58,7 @@ export const useSmartAccount = (): UseSmartAccountState => {
   const refreshBalance = useCallback(async () => {
     try {
       if (!address) return;
-      const provider = getProvider();
+      const provider = await getProvider();
       const bal = await provider.getBalance(address);
       setBalance(ethers.utils.formatEther(bal));
     } catch (e: any) {
