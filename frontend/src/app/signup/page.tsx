@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { AIChat } from "../components/AIChat";
+import { SidebarLinks } from "../components/SidebarLinks";
 
 export default function SignUp() {
   const [walletName, setWalletName] = useState("");
@@ -8,7 +10,6 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +27,6 @@ export default function SignUp() {
     setLoading(true);
     try {
       await new Promise((r) => setTimeout(r, 1500));
-
       setMessage(`✅ Wallet "${walletName}" successfully created!`);
     } catch (err) {
       console.error(err);
@@ -109,53 +109,13 @@ export default function SignUp() {
         </div>
       </div>
 
-      <footer className="absolute bottom-6 text-gray-500 text-sm">
+      <footer className="absolute bottom-6 right-6 text-gray-500 text-sm">
         Built at ETHOnline 2025
       </footer>
-      <div className="absolute bottom-24 right-6 flex flex-col items-end space-y-2">
-        {!isOpen && (
-          <button
-            onClick={() => setIsOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg cursor-pointer"
-          >
-            AI Chat
-          </button>
-        )}
 
-        {isOpen && (
-          <div className="w-80 h-96 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg p-4 flex flex-col justify-between mt-2 relative">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-3 right-3 text-white hover:text-gray-300 font-bold text-lg"
-            >
-              ✕
-            </button>
+      <SidebarLinks />
 
-            <div className="font-semibold text-white text-center mb-2">
-              AI Agent
-            </div>
-            <div className="flex-1 overflow-y-auto text-gray-200 text-sm p-2 rounded-lg">
-              <p className="text-gray-400 text-center mt-20">
-                👋 Chat will be available soon...
-              </p>
-            </div>
-            <div className="mt-3 flex">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                disabled
-                className="flex-1 bg-white/20 text-white rounded-l-lg px-1 py-2 focus:outline-none"
-              />
-              <button
-                disabled
-                className="bg-blue-500/70 px-3 py-2 rounded-r-lg text-white cursor-not-allowed"
-              >
-                Send
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      <AIChat />
     </main>
   );
 }

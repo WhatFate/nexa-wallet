@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { ethers } from "ethers";
-import { getProvider, getDevSigner } from "../utils/rpc";
+import { getProvider, getDevSigner } from "../utils/rpcBackend";
 import { SimpleAccountAPI } from "@account-abstraction/sdk";
 
 type UseSmartAccountState = {
