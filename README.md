@@ -66,9 +66,9 @@ Main functionalities:
 
 | Status | Feature | Description |
 |--------|---------|-------------|
-| ⚙️ **In Progress** | Wallet Structure & Account Abstraction | Minimal smart contract wallet deployed; basic frontend landing page with login/signup. |
+| ✅ **Completed** | Wallet Structure & Account Abstraction | Minimal smart contract wallet deployed; basic frontend landing page with login/signup. |
+| ⚙️ **In Progress**     | DeFi & Cross-Chain Skeleton | Basic Swap, Send/Receive buttons in frontend; Avail Nexus SDK structure integrated for future cross-chain operations. |
 | ⏳ **Planned**     | AI Agent Interface | Chat UI implemented (currently placeholder, non-functional), ready for future AI integration. |
-| ⏳ **Planned**     | DeFi & Cross-Chain Skeleton | Basic Swap, Send/Receive buttons in frontend; Avail Nexus SDK structure integrated for future cross-chain operations. |
 | ⏳ **Planned**     | Transaction History | Integrating Blockscout MCP to fetch verified on-chain data and display user transactions in frontend. |
 | ⏳ **Planned**     | AI Agent Logic | Connecting AI agent to on-chain data, preparing responses for wallet queries and DeFi operations. |
 | ⏳ **Planned**     | Cross-Chain Features | Testing Avail Nexus SDK “Bridge & Execute” and cross-chain swap functionalities. |

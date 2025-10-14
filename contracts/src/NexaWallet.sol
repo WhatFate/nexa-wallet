@@ -1,37 +1,107 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.30;
+pragma solidity 0.8.28;
 
 import {IEntryPoint} from "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
-import {BaseAccount} from "@account-abstraction/contracts/core/BaseAccount.sol";
-import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {ECDSA} from "@openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import {PackedUserOperation} from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "@account-abstraction/contracts/core/Helpers.sol";
+import {SafeERC20, IERC20} from "@openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import {Ownable} from "@openzeppelin-contracts/contracts/access/Ownable.sol";
+import {MessageHashUtils} from "@openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol";
 
-contract NexaWallet is BaseAccount {
-    address public owner;
+contract NexaWallet is Ownable {
+    error NexaWallet__NotCalledByEntryPoint();
+    error NexaWallet__TransactionFailed();
+    error NexaWallet__InvalidNonce();
+
+    event ERC20Transfer(address indexed token, address indexed to, uint256 amount);
+    event EtherTransfer(address indexed to, uint256 amount, bytes data);
+
     IEntryPoint private immutable i_entryPoint;
+    address private immutable i_uniswapRouter;
 
-    constructor(address entryPoint) {
-        i_entryPoint = IEntryPoint(entryPoint);
+    uint256 private nonce;
+
+    constructor(address _entryPoint, address uniswapRouter, address user) Ownable(user) {
+        i_entryPoint = IEntryPoint(_entryPoint);
+        i_uniswapRouter = uniswapRouter;
     }
 
-    function initialize(address _owner) external {
-        require(owner == address(0), "Already initialized");
-        owner = _owner;
-    }
-
-    function entryPoint() public view override returns (IEntryPoint) {
-        return i_entryPoint;
-    }
-
-    function _validateSignature(
-        PackedUserOperation calldata userOp,
-        bytes32 userOpHash
-    ) internal virtual override returns (uint256 validationData) {
-        if (owner != ECDSA.recover(userOpHash, userOp.signature))
-            return SIG_VALIDATION_FAILED;
-        return SIG_VALIDATION_SUCCESS;
+    modifier onlyEntryPoint() {
+        if (msg.sender != address(i_entryPoint)) {
+            revert NexaWallet__NotCalledByEntryPoint();
+        }
+        _;
     }
 
     receive() external payable {}
+
+    function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
+        external
+        onlyEntryPoint
+        returns (uint256 validationData)
+    {
+        validationData = _validateSignature(userOp, userOpHash);
+        _checkAndIncrementNonce(userOp.nonce);
+
+        if (missingAccountFunds > 0) {
+            (bool success, ) = payable(msg.sender).call{value: missingAccountFunds}("");
+            require(success, "Failed to fund EntryPoint");
+        }
+    }
+
+    function _validateSignature(PackedUserOperation calldata userOp, bytes32 userOpHash)
+        internal
+        view
+        returns (uint256 validationData)
+    {
+        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(userOpHash);
+        address signer = ECDSA.recover(ethSignedMessageHash, userOp.signature);
+        if (signer != owner()) {
+            return SIG_VALIDATION_FAILED;
+        }
+        return SIG_VALIDATION_SUCCESS;
+    }
+
+    // function swap(
+    //     address token1,
+    //     address token2,
+    //     uint256 amount
+    // ) external payable onlyEntryPoint {}
+
+    function transferERC20(
+        address target,
+        uint256 amount,
+        address tokenAddress
+    ) external onlyEntryPoint {
+        IERC20 erc20 = IERC20(tokenAddress);
+        SafeERC20.safeTransfer(erc20, target, amount);
+        emit ERC20Transfer(tokenAddress, target, amount);
+    }
+
+    function transferEtherWithCall(
+        address target,
+        uint256 amount,
+        bytes memory callData
+    ) external payable onlyEntryPoint {
+        (bool success, bytes memory returnData) = payable(target).call{value: amount}(
+            callData
+        );
+        if (!success) {
+            revert NexaWallet__TransactionFailed();
+        }
+        emit EtherTransfer(target, amount, returnData);
+    }
+
+    function _checkAndIncrementNonce(uint256 _nonce) internal {
+        if (_nonce != nonce) {
+            revert NexaWallet__InvalidNonce();
+        }
+
+        unchecked { nonce += 1; }
+    }
+
+    function getEntryPoint() external view returns (address) {
+        return address(i_entryPoint);
+    }
 }
