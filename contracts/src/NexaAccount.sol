@@ -9,27 +9,27 @@ import {SafeERC20, IERC20} from "@openzeppelin-contracts/contracts/token/ERC20/u
 import {Ownable} from "@openzeppelin-contracts/contracts/access/Ownable.sol";
 import {MessageHashUtils} from "@openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol";
 
-contract NexaWallet is Ownable {
-    error NexaWallet__NotCalledByEntryPoint();
-    error NexaWallet__TransactionFailed();
-    error NexaWallet__InvalidNonce();
+contract NexaAccount is Ownable {
+    error NexaAccount__NotCalledByEntryPoint();
+    error NexaAccount__TransactionFailed();
+    error NexaAccount__InvalidNonce();
 
     event ERC20Transfer(address indexed token, address indexed to, uint256 amount);
     event EtherTransfer(address indexed to, uint256 amount, bytes data);
 
     IEntryPoint private immutable i_entryPoint;
-    address private immutable i_uniswapRouter;
+    // address private immutable i_uniswapRouter;
 
     uint256 private nonce;
 
-    constructor(address _entryPoint, address uniswapRouter, address user) Ownable(user) {
+    constructor(address _entryPoint, /*address uniswapRouter ,*/ address owner) Ownable(owner) {
         i_entryPoint = IEntryPoint(_entryPoint);
-        i_uniswapRouter = uniswapRouter;
+        // i_uniswapRouter = uniswapRouter;
     }
 
     modifier onlyEntryPoint() {
         if (msg.sender != address(i_entryPoint)) {
-            revert NexaWallet__NotCalledByEntryPoint();
+            revert NexaAccount__NotCalledByEntryPoint();
         }
         _;
     }
@@ -81,21 +81,20 @@ contract NexaWallet is Ownable {
 
     function transferEtherWithCall(
         address target,
-        uint256 amount,
         bytes memory callData
     ) external payable onlyEntryPoint {
-        (bool success, bytes memory returnData) = payable(target).call{value: amount}(
+        (bool success, bytes memory returnData) = payable(target).call{value: msg.value}(
             callData
         );
         if (!success) {
-            revert NexaWallet__TransactionFailed();
+            revert NexaAccount__TransactionFailed();
         }
-        emit EtherTransfer(target, amount, returnData);
+        emit EtherTransfer(target, msg.value, returnData);
     }
 
     function _checkAndIncrementNonce(uint256 _nonce) internal {
         if (_nonce != nonce) {
-            revert NexaWallet__InvalidNonce();
+            revert NexaAccount__InvalidNonce();
         }
 
         unchecked { nonce += 1; }
