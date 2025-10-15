@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { AIChat } from "../components/AIChat";
-import { SidebarLinks } from "../components/SidebarLinks";
+import { AIChat } from "../../components/AIChat";
+import { SidebarLinks } from "../../components/SidebarLinks";
 
 export default function LogIn() {
   const [walletName, setWalletName] = useState("");

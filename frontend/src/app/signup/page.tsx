@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { AIChat } from "../components/AIChat";
-import { SidebarLinks } from "../components/SidebarLinks";
+import { AIChat } from "../../components/AIChat";
+import { SidebarLinks } from "../../components/SidebarLinks";
+import { createWallet } from "../../lib/wallet";
+import { deploySmartWallet } from "../../lib/factory";
+import { getEntryPoint } from "@/lib/test/rpcBackend";
 
 export default function SignUp() {
   const [walletName, setWalletName] = useState("");
@@ -14,23 +17,43 @@ export default function SignUp() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
-
-    if (!walletName || !password || !confirmPassword) {
-      setMessage("Please fill in all fields.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setMessage("Passwords do not match.");
-      return;
-    }
-
     setLoading(true);
+
     try {
-      await new Promise((r) => setTimeout(r, 1500));
-      setMessage(`✅ Wallet "${walletName}" successfully created!`);
+      if (!walletName || !password || !confirmPassword) {
+        setMessage("Please fill in all fields.");
+        setLoading(false);
+        return;
+      }
+      if (password !== confirmPassword) {
+        setMessage("Passwords do not match.");
+        setLoading(false);
+        return;
+      }
+
+      const wallet = await createWallet(walletName, password);
+      console.log("EOA wallet:", wallet.address);
+
+      localStorage.setItem("walletAddress", wallet.address);
+      localStorage.setItem("walletPrivateKey", wallet.privateKey);
+
+      const entryPointAddress = await getEntryPoint();
+
+      const { txHash, smartWalletAddress } = await deploySmartWallet(
+        wallet.address,
+        entryPointAddress
+      );
+      console.log(
+        "Smart wallet deployed at:",
+        smartWalletAddress,
+        "TX:",
+        txHash
+      );
+
+      localStorage.setItem("smartWalletAddress", smartWalletAddress);
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Failed to create wallet. Try again.");
+      console.error("Error in SignUp:", err);
+      setMessage("Failed to create wallets. Check console.");
     } finally {
       setLoading(false);
     }
