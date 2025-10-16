@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AIChat } from "../../components/AIChat";
 import { SidebarLinks } from "../../components/SidebarLinks";
 import { createWallet } from "../../lib/wallet";
@@ -13,6 +14,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,26 +33,53 @@ export default function SignUp() {
         return;
       }
 
-      const wallet = await createWallet(walletName, password);
-      console.log("EOA wallet:", wallet.address);
+      const checkRes = await fetch(
+        "http://127.0.0.1:5000/api/user/check-username",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: walletName }),
+        }
+      );
+      const checkData = await checkRes.json();
+      if (checkData.exists) {
+        setMessage("Username already exists. Choose another one.");
+        setLoading(false);
+        return;
+      }
 
+      const wallet = await createWallet(walletName, password);
       localStorage.setItem("walletAddress", wallet.address);
       localStorage.setItem("walletPrivateKey", wallet.privateKey);
 
       const entryPointAddress = await getEntryPoint();
-
-      const { txHash, smartWalletAddress } = await deploySmartWallet(
+      const { smartWalletAddress } = await deploySmartWallet(
         wallet.address,
         entryPointAddress
       );
-      console.log(
-        "Smart wallet deployed at:",
-        smartWalletAddress,
-        "TX:",
-        txHash
+      localStorage.setItem("smartWalletAddress", smartWalletAddress);
+      localStorage.setItem("walletName", walletName);
+
+      const registerRes = await fetch(
+        "http://127.0.0.1:5000/api/user/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: walletName,
+            address: smartWalletAddress,
+          }),
+        }
       );
 
-      localStorage.setItem("smartWalletAddress", smartWalletAddress);
+      if (!registerRes.ok) {
+        const errData = await registerRes.json();
+        setMessage(errData.error || "Failed to register user on backend");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard");
     } catch (err) {
       console.error("Error in SignUp:", err);
       setMessage("Failed to create wallets. Check console.");

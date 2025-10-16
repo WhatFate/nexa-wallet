@@ -1,15 +1,25 @@
 "use client";
 import Link from "next/link";
 import { AIChat } from "../../components/AIChat";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Dashboard() {
-  const user = {
-    username: "nexa_user.eth",
-    accountAddress: "0xA4c7...93B1",
-  };
-
+  const [user, setUser] = useState<{
+    username: string;
+    accountAddress: string;
+  } | null>(null);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
+
+  useEffect(() => {
+    const username = localStorage.getItem("walletName") || "Unknown";
+    const accountAddress =
+      localStorage.getItem("smartWalletAddress") || "0x0000...";
+    setUser({ username, accountAddress });
+  }, []);
+
+  if (!user) {
+    return <div className="text-white text-center mt-20">Loading...</div>;
+  }
 
   return (
     <main className="min-h-screen w-full flex bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white font-sans overflow-hidden">
@@ -21,20 +31,20 @@ export default function Dashboard() {
         <nav className="flex flex-col flex-grow justify-evenly items-stretch px-4 py-6 relative">
           <button
             onClick={() => setShowWalletMenu(!showWalletMenu)}
-            className="flex items-center justify-center gap-3 py-4 rounded-xl bg-[#1e3a8a] hover:bg-[#2a4dbf] shadow-md hover:shadow-blue-500/40 transition-all text-lg font-medium text-gray-100 w-full"
+            className="flex items-center justify-center gap-3 py-4 rounded-xl bg-[#1e3a8a] hover:bg-[#2a4dbf] shadow-md hover:shadow-blue-500/40 transition-all text-lg font-medium text-gray-100 w-full cursor-pointer"
           >
             <span>Wallet</span>
           </button>
 
           {showWalletMenu && (
-            <div className="absolute left-full top-0 ml-2 bg-gray-800 rounded-xl shadow-lg w-40 flex flex-col py-2 z-50">
-              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md">
+            <div className="absolute left-full top-25 ml-2 bg-gray-800 rounded-xl shadow-lg w-40 flex flex-col py-2 z-50">
+              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md cursor-pointer">
                 Send
               </button>
-              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md">
+              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md cursor-pointer">
                 Receive
               </button>
-              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md">
+              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md cursor-pointer">
                 Swap
               </button>
             </div>
@@ -61,15 +71,30 @@ export default function Dashboard() {
       <section className="ml-60 md:ml-64 flex flex-col flex-grow w-full px-8 py-8 relative">
         <div className="absolute right-8 top-6 bg-gray-800/80 border border-gray-700 rounded-2xl shadow-lg p-4 flex items-center gap-4 backdrop-blur-md">
           <div className="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-lg font-bold">
-            {user.username[0].toUpperCase()}
+            {user.username?.[0]?.toUpperCase() || "U"}
           </div>
+
           <div className="flex flex-col text-sm">
-            <span className="font-semibold text-white">{user.username}</span>
-            <span className="text-gray-400">{user.accountAddress}</span>
+            <span className="font-semibold text-white">
+              {`Your wallet name: ${user.username}`}
+            </span>
+            <span className="text-gray-400">
+              {`Your address: ${user.accountAddress.slice(
+                0,
+                6
+              )}...${user.accountAddress.slice(-4)}`}
+            </span>
           </div>
-          <button className="ml-3 bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg text-xs font-medium transition">
-            Copy
-          </button>
+
+          {user.accountAddress && (
+            <button
+              onClick={() => navigator.clipboard.writeText(user.accountAddress)}
+              className="ml-3 bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer"
+              title="Copy full address"
+            >
+              Copy Address
+            </button>
+          )}
         </div>
 
         <div className="text-center mt-20">
@@ -113,7 +138,7 @@ export default function Dashboard() {
           </div>
 
           <div className="flex justify-center mt-10">
-            <button className="bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-xl text-lg font-semibold shadow-md hover:shadow-blue-500/40 transition-all">
+            <button className="bg-blue-700 hover:bg-blue-800 px-6 py-3 rounded-xl text-lg font-semibold shadow-md hover:shadow-blue-500/40 transition-all cursor-pointer">
               + Add Token
             </button>
           </div>
