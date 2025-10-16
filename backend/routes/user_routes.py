@@ -1,0 +1,36 @@
+from flask import Blueprint, request, jsonify
+from models.user_model import users
+
+user_bp = Blueprint("user_bp", __name__, url_prefix="/api/user")
+
+@user_bp.route("/register", methods=["POST"])
+def register():
+    data = request.json
+    username = data.get("username")
+    address = data.get("address")
+
+    if not username or not address:
+        return jsonify({"error": "Missing fields"}), 400
+
+    if users.find_one({"username": username}):
+        return jsonify({"error": "Username already exists"}), 400
+
+    users.insert_one({
+        "username": username,
+        "address": address
+    })
+
+    return jsonify({"message": "User registered", "address": address}), 201
+
+@user_bp.route("/check-username", methods=["POST"])
+def check_username():
+    data = request.json
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"error": "Missing username"}), 400
+
+    if users.find_one({"username": username}):
+        return jsonify({"exists": True}), 200
+
+    return jsonify({"exists": False}), 200
