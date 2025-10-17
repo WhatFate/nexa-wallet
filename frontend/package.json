@@ -14,6 +14,8 @@
     "@alchemy/aa-accounts": "^3.19.0",
     "@alchemy/aa-core": "^3.19.0",
     "@alchemy/aa-ethers": "^3.19.0",
+    "@pythnetwork/price-service-client": "^1.9.0",
+    "@pythnetwork/pyth-sdk-solidity": "^4.2.0",
     "dotenv": "^17.2.3",
     "ethers": "^5.8.0",
     "next": "15.5.4",

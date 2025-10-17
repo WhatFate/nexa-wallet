@@ -1,14 +1,14 @@
 "use client";
-import Link from "next/link";
-import { AIChat } from "../../components/AIChat";
 import { useState, useEffect } from "react";
+import Sidebar from "@/components/dashboard/Sidebar";
+import UserInfo from "@/components/dashboard/UserInfo";
+import TokenCard, { Token } from "@/components/dashboard/TokenCard";
+import { useBalances } from "@/hooks/useBalances";
+import { User } from "@/types";
+import { AIChat } from "../../components/AIChat";
 
 export default function Dashboard() {
-  const [user, setUser] = useState<{
-    username: string;
-    aaAddress: string;
-  } | null>(null);
-  const [showWalletMenu, setShowWalletMenu] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const username = localStorage.getItem("username") || "Unknown";
@@ -16,85 +16,34 @@ export default function Dashboard() {
     setUser({ username, aaAddress });
   }, []);
 
-  if (!user) {
+  const { balances, loading, fetchAllBalances } = useBalances(user?.aaAddress);
+
+  if (!user)
     return <div className="text-white text-center mt-20">Loading...</div>;
-  }
+
+  const tokens: Token[] = [
+    {
+      name: "ETH",
+      balance: balances ? `${balances.eth.toFixed(4)} ETH` : "Loading...",
+      price: "$3,420.10",
+    },
+    {
+      name: "USDC",
+      balance: balances ? `${balances.usdc.toFixed(2)} USDC` : "Loading...",
+      price: "$5,000.00",
+    },
+    {
+      name: "WETH",
+      balance: balances ? `${balances.weth.toFixed(2)} WETH` : "Loading...",
+      price: "$4,120.13",
+    },
+  ];
 
   return (
     <main className="min-h-screen w-full flex bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white font-sans overflow-hidden">
-      <aside className="w-60 md:w-64 h-screen fixed left-0 top-0 flex flex-col justify-between border-r border-gray-800 bg-gray-900/70 backdrop-blur-md">
-        <div className="p-6 text-2xl font-bold text-center border-b border-gray-800">
-          Nexa Wallet
-        </div>
-
-        <nav className="flex flex-col flex-grow justify-evenly items-stretch px-4 py-6 relative">
-          <button
-            onClick={() => setShowWalletMenu(!showWalletMenu)}
-            className="flex items-center justify-center gap-3 py-4 rounded-xl bg-[#1e3a8a] hover:bg-[#2a4dbf] shadow-md hover:shadow-blue-500/40 transition-all text-lg font-medium text-gray-100 w-full cursor-pointer"
-          >
-            <span>Wallet</span>
-          </button>
-
-          {showWalletMenu && (
-            <div className="absolute left-full top-25 ml-2 bg-gray-800 rounded-xl shadow-lg w-40 flex flex-col py-2 z-50">
-              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md cursor-pointer">
-                Send
-              </button>
-              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md cursor-pointer">
-                Receive
-              </button>
-              <button className="px-4 py-2 hover:bg-gray-700 transition-all text-left rounded-md cursor-pointer">
-                Swap
-              </button>
-            </div>
-          )}
-
-          {[{ label: "DeFi" }, { label: "History" }, { label: "Settings" }].map(
-            (item) => (
-              <Link
-                key={item.label}
-                href="#"
-                className="flex items-center justify-center gap-3 py-4 rounded-xl bg-[#1e3a8a] hover:bg-[#2a4dbf] shadow-md hover:shadow-blue-500/40 transition-all text-lg font-medium text-gray-100"
-              >
-                <span>{item.label}</span>
-              </Link>
-            )
-          )}
-        </nav>
-
-        <div className="p-4 text-center text-sm text-gray-500 border-t border-gray-800">
-          © 2025 Nexa Wallet
-        </div>
-      </aside>
-
+      <Sidebar />
       <section className="ml-60 md:ml-64 flex flex-col flex-grow w-full px-8 py-8 relative">
-        <div className="absolute right-8 top-6 bg-gray-800/80 border border-gray-700 rounded-2xl shadow-lg p-4 flex items-center gap-4 backdrop-blur-md">
-          <div className="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-lg font-bold">
-            {user.username?.[0]?.toUpperCase() || "U"}
-          </div>
-
-          <div className="flex flex-col text-sm">
-            <span className="font-semibold text-white">
-              {`Your username: ${user.username}`}
-            </span>
-            <span className="text-gray-400">
-              {`Your address: ${user.aaAddress.slice(
-                0,
-                6
-              )}...${user.aaAddress.slice(-4)}`}
-            </span>
-          </div>
-
-          {user.aaAddress && (
-            <button
-              onClick={() => navigator.clipboard.writeText(user.aaAddress)}
-              className="ml-3 bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer"
-              title="Copy full address"
-            >
-              Copy Address
-            </button>
-          )}
-        </div>
+        <UserInfo user={user} />
 
         <div className="text-center mt-20">
           <h2 className="text-4xl font-bold mb-3">Your Portfolio</h2>
@@ -107,33 +56,29 @@ export default function Dashboard() {
           <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 p-8 rounded-3xl shadow-lg text-center mb-8">
             <h3 className="text-xl text-gray-300 mb-2">Total Balance</h3>
             <p className="text-5xl font-extrabold text-white">$12,540.23</p>
-            <p className="text-sm text-gray-400 mt-2">≈ 4.58 ETH total value</p>
+            <p className="text-sm text-gray-400 mt-2">
+              ≈ {balances?.eth.toFixed(4) || 0} ETH total value
+            </p>
+          </div>
+
+          <div className="flex justify-end mb-6">
+            <button
+              onClick={fetchAllBalances}
+              disabled={loading}
+              className={`text-sm px-4 py-2 rounded-lg ${
+                loading
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-blue-700 hover:bg-blue-800"
+              } transition`}
+            >
+              {loading ? "Refreshing..." : "Refresh All"}
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-gray-800 rounded-2xl shadow-lg hover:bg-gray-700 transition-all">
-              <h3 className="text-xl font-bold mb-2 flex items-center justify-between">
-                <span>ETH</span>
-              </h3>
-              <p className="text-gray-300 text-lg">1.25 ETH</p>
-              <p className="text-gray-500 text-sm">$3,420.10</p>
-            </div>
-
-            <div className="p-6 bg-gray-800 rounded-2xl shadow-lg hover:bg-gray-700 transition-all">
-              <h3 className="text-xl font-bold mb-2 flex items-center justify-between">
-                <span>USDC</span>
-              </h3>
-              <p className="text-gray-300 text-lg">5,000 USDC</p>
-              <p className="text-gray-500 text-sm">$5,000.00</p>
-            </div>
-
-            <div className="p-6 bg-gray-800 rounded-2xl shadow-lg hover:bg-gray-700 transition-all">
-              <h3 className="text-xl font-bold mb-2 flex items-center justify-between">
-                <span>AVAIL</span>
-              </h3>
-              <p className="text-gray-300 text-lg">2,000 AVAIL</p>
-              <p className="text-gray-500 text-sm">$4,120.13</p>
-            </div>
+            {tokens.map((token) => (
+              <TokenCard key={token.name} token={token} />
+            ))}
           </div>
 
           <div className="flex justify-center mt-10">
