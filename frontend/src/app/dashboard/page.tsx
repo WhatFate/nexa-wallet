@@ -6,15 +6,14 @@ import { useState, useEffect } from "react";
 export default function Dashboard() {
   const [user, setUser] = useState<{
     username: string;
-    accountAddress: string;
+    aaAddress: string;
   } | null>(null);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
 
   useEffect(() => {
-    const username = localStorage.getItem("walletName") || "Unknown";
-    const accountAddress =
-      localStorage.getItem("smartWalletAddress") || "0x0000...";
-    setUser({ username, accountAddress });
+    const username = localStorage.getItem("username") || "Unknown";
+    const aaAddress = localStorage.getItem("aaAddress") || "0x0000...";
+    setUser({ username, aaAddress });
   }, []);
 
   if (!user) {
@@ -76,19 +75,19 @@ export default function Dashboard() {
 
           <div className="flex flex-col text-sm">
             <span className="font-semibold text-white">
-              {`Your wallet name: ${user.username}`}
+              {`Your username: ${user.username}`}
             </span>
             <span className="text-gray-400">
-              {`Your address: ${user.accountAddress.slice(
+              {`Your address: ${user.aaAddress.slice(
                 0,
                 6
-              )}...${user.accountAddress.slice(-4)}`}
+              )}...${user.aaAddress.slice(-4)}`}
             </span>
           </div>
 
-          {user.accountAddress && (
+          {user.aaAddress && (
             <button
-              onClick={() => navigator.clipboard.writeText(user.accountAddress)}
+              onClick={() => navigator.clipboard.writeText(user.aaAddress)}
               className="ml-3 bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer"
               title="Copy full address"
             >

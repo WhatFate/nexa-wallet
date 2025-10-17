@@ -8,9 +8,9 @@ export function generateWalletKey(username: string, password: string, salt: stri
   return hash;
 }
 
-export async function createWallet(username: string, password: string) {
+export async function createEOAWallet(username: string, password: string) {
   const salt = await getSalt();
   const privateKey = generateWalletKey(username, password, salt);
-  const wallet = new ethers.Wallet(privateKey);
-  return wallet;
+  const eoaWallet = new ethers.Wallet(privateKey);
+  return eoaWallet;
 }

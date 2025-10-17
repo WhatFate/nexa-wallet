@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AIChat } from "../../components/AIChat";
 import { SidebarLinks } from "../../components/SidebarLinks";
-import { createWallet } from "../../lib/wallet";
-import { deploySmartWallet } from "../../lib/factory";
+import { createEOAWallet } from "../../lib/wallet";
+import { deployAccountAbstraction } from "../../lib/factory";
 import { getEntryPoint } from "@/lib/test/rpcBackend";
 
 export default function SignUp() {
-  const [walletName, setWalletName] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      if (!walletName || !password || !confirmPassword) {
+      if (!username || !password || !confirmPassword) {
         setMessage("Please fill in all fields.");
         setLoading(false);
         return;
@@ -38,7 +38,7 @@ export default function SignUp() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: walletName }),
+          body: JSON.stringify({ username: username }),
         }
       );
       const checkData = await checkRes.json();
@@ -48,17 +48,17 @@ export default function SignUp() {
         return;
       }
 
-      const wallet = await createWallet(walletName, password);
-      localStorage.setItem("walletAddress", wallet.address);
-      localStorage.setItem("walletPrivateKey", wallet.privateKey);
+      const eoaWallet = await createEOAWallet(username, password);
+      localStorage.setItem("eoaAddress", eoaWallet.address);
+      localStorage.setItem("eoaPrivateKey", eoaWallet.privateKey);
 
       const entryPointAddress = await getEntryPoint();
-      const { smartWalletAddress } = await deploySmartWallet(
-        wallet.address,
+      const { aaAddress } = await deployAccountAbstraction(
+        eoaWallet.address,
         entryPointAddress
       );
-      localStorage.setItem("smartWalletAddress", smartWalletAddress);
-      localStorage.setItem("walletName", walletName);
+      localStorage.setItem("aaAddress", aaAddress);
+      localStorage.setItem("username", username);
 
       const registerRes = await fetch(
         "http://127.0.0.1:5000/api/user/register",
@@ -66,8 +66,9 @@ export default function SignUp() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            username: walletName,
-            address: smartWalletAddress,
+            username: username,
+            eoaAddress: eoaWallet.address,
+            aaAddress: aaAddress,
           }),
         }
       );
@@ -97,13 +98,11 @@ export default function SignUp() {
 
         <form onSubmit={handleSignUp} className="space-y-4">
           <div>
-            <label className="block text-gray-300 text-sm mb-1">
-              Wallet Name
-            </label>
+            <label className="block text-gray-300 text-sm mb-1">Username</label>
             <input
               type="text"
-              value={walletName}
-              onChange={(e) => setWalletName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g. mywallet123"
               className="w-full bg-white/20 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

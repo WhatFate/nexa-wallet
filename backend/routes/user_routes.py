@@ -7,9 +7,10 @@ user_bp = Blueprint("user_bp", __name__, url_prefix="/api/user")
 def register():
     data = request.json
     username = data.get("username")
-    address = data.get("address")
+    eoaAddress = data.get("eoaAddress")
+    aaAddress = data.get("aaAddress")
 
-    if not username or not address:
+    if not username or not eoaAddress or not aaAddress:
         return jsonify({"error": "Missing fields"}), 400
 
     if users.find_one({"username": username}):
@@ -17,10 +18,11 @@ def register():
 
     users.insert_one({
         "username": username,
-        "address": address
+        "eoaAddress": eoaAddress,
+        "aaAddress": aaAddress
     })
 
-    return jsonify({"message": "User registered", "address": address}), 201
+    return jsonify({"message": "User registered", "eoaAddress": eoaAddress}), 201
 
 @user_bp.route("/check-username", methods=["POST"])
 def check_username():
@@ -34,3 +36,5 @@ def check_username():
         return jsonify({"exists": True}), 200
 
     return jsonify({"exists": False}), 200
+
+
