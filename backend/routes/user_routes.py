@@ -24,6 +24,29 @@ def register():
 
     return jsonify({"message": "User registered", "eoaAddress": eoaAddress}), 201
 
+@user_bp.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    username = data.get("username")
+    eoaAddress = data.get("eoaAddress")
+
+    if not username or not eoaAddress:
+        return jsonify({"success": False}), 400
+
+    user = users.find_one({"username": username})
+
+    if not user:
+        return jsonify({"success": False}), 404
+
+    if user["eoaAddress"] != eoaAddress:
+        return jsonify({"success": False}), 401
+
+    return jsonify({
+        "success": True,
+        "aaAddress": user["aaAddress"]
+    }), 200
+
+
 @user_bp.route("/check-username", methods=["POST"])
 def check_username():
     data = request.json
@@ -36,5 +59,4 @@ def check_username():
         return jsonify({"exists": True}), 200
 
     return jsonify({"exists": False}), 200
-
 

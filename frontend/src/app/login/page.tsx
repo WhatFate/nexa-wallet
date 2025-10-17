@@ -1,31 +1,66 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AIChat } from "../../components/AIChat";
 import { SidebarLinks } from "../../components/SidebarLinks";
+import { createEOAWallet } from "../../lib/wallet";
 
 export default function LogIn() {
-  const [walletName, setWalletName] = useState("");
+  const [username, setusername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleLogIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
 
-    if (!walletName || !password) {
+    if (!username || !password) {
       setMessage("Please fill in all fields.");
       return;
     }
 
     setLoading(true);
+
     try {
-      await new Promise((r) => setTimeout(r, 1500));
-      setMessage(`✅ Welcome back, "${walletName}"!`);
+      const checkRes = await fetch(
+        "http://127.0.0.1:5000/api/user/check-username",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        }
+      );
+      const checkData = await checkRes.json();
+
+      if (!checkData.exists) {
+        setMessage("Account does not exist.");
+        return;
+      }
+
+      const eoaAddress = (await createEOAWallet(username, password)).address;
+
+      const loginRes = await fetch("http://127.0.0.1:5000/api/user/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, eoaAddress }),
+      });
+      const loginData = await loginRes.json();
+
+      if (!loginData.success) {
+        setMessage("Wrong username or password.");
+        return;
+      }
+
+      localStorage.setItem("aaAddress", loginData.aaAddress);
+      localStorage.setItem("username", username);
+
+      router.push("/dashboard");
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Failed to log in. Try again.");
+      console.error("Login error:", err);
+      setMessage("Failed to log in. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -40,14 +75,12 @@ export default function LogIn() {
 
         <form onSubmit={handleLogIn} className="space-y-4">
           <div>
-            <label className="block text-gray-300 text-sm mb-1">
-              Wallet Name
-            </label>
+            <label className="block text-gray-300 text-sm mb-1">Username</label>
             <input
               type="text"
-              value={walletName}
-              onChange={(e) => setWalletName(e.target.value)}
-              placeholder="Enter your wallet name"
+              value={username}
+              onChange={(e) => setusername(e.target.value)}
+              placeholder="Enter your username"
               className="w-full bg-white/20 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
