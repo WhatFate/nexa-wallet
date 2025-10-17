@@ -1,6 +1,6 @@
 "use client";
-import { AIChat } from "../components/AIChat";
-import { SidebarLinks } from "../components/SidebarLinks";
+import { AIChat } from "@/components/AIChat";
+import { SidebarLinks } from "@/components/SidebarLinks";
 import Link from "next/link";
 
 export default function Home() {

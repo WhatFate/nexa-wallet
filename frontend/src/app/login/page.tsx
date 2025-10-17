@@ -2,9 +2,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AIChat } from "../../components/AIChat";
-import { SidebarLinks } from "../../components/SidebarLinks";
-import { createEOAWallet } from "../../lib/wallet";
+import { AIChat } from "@/components/AIChat";
+import { SidebarLinks } from "@/components/SidebarLinks";
+import { createEOAWallet } from "@/lib/wallet";
 
 export default function LogIn() {
   const [username, setusername] = useState("");

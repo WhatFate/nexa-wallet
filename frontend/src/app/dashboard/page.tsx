@@ -5,7 +5,7 @@ import UserInfo from "@/components/dashboard/UserInfo";
 import TokenCard, { Token } from "@/components/dashboard/TokenCard";
 import { useBalances } from "@/hooks/useBalances";
 import { User } from "@/types";
-import { AIChat } from "../../components/AIChat";
+import { AIChat } from "@/components/AIChat";
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -23,7 +23,7 @@ export default function Dashboard() {
 
   const tokens: Token[] = [
     {
-      name: "ETH",
+      name: "Ethereum",
       balance: balances ? `${balances.eth.toFixed(4)} ETH` : "Loading...",
       price: "$3,420.10",
     },

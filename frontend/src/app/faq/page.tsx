@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AIChat } from "../../components/AIChat";
+import { AIChat } from "@/components/AIChat";
 
 type FAQItem = {
   category: string;
