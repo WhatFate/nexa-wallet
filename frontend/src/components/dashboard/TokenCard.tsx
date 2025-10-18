@@ -1,16 +1,21 @@
 "use client";
-import { useState } from "react";
 import TokenModal from "./TokenModal";
+import { Token } from "../../types";
+import { useState } from "react";
 
-export interface Token {
-  name: string;
-  balance: string;
-  price: string;
+interface TokenCardProps {
+  token: Token;
+  activeMenu: string | null;
+  setActiveMenu: (name: string | null) => void;
 }
 
-export default function TokenCard({ token }: { token: Token }) {
-  const [menuVisible, setMenuVisible] = useState(false);
+export default function TokenCard({
+  token,
+  activeMenu,
+  setActiveMenu,
+}: TokenCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const menuVisible = activeMenu === token.name;
 
   return (
     <>
@@ -21,7 +26,7 @@ export default function TokenCard({ token }: { token: Token }) {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            setMenuVisible(!menuVisible);
+            setActiveMenu(menuVisible ? null : token.name);
           }}
           className="absolute top-2 right-2 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold hover:bg-gray-600 cursor-pointer"
         >
@@ -30,7 +35,14 @@ export default function TokenCard({ token }: { token: Token }) {
 
         {menuVisible && (
           <div className="absolute top-8 right-2 bg-gray-900 border border-gray-700 rounded-lg shadow-lg flex flex-col py-1 z-50">
-            <button className="px-3 py-1 text-sm hover:bg-gray-700 transition-all">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log("Hide", token.name);
+                setActiveMenu(null);
+              }}
+              className="px-3 py-1 text-sm hover:bg-gray-700 transition-all"
+            >
               Hide {token.name}
             </button>
           </div>

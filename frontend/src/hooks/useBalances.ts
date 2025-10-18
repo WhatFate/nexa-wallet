@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getEthBalance, getTokenBalance } from "@/lib/getBalance";
+import { getEthBalance, getTokenBalance } from "@/lib/token";
 
 export function useBalances(aaAddress: string | undefined) {
   const [balances, setBalances] = useState<{
