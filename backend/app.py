@@ -15,6 +15,7 @@ app.register_blueprint(user_bp)
 def get_env():
     return {
         "rpc_url": os.getenv("ALCHEMY_RPC_URL"),
+        "api_key": os.getenv("ALCHEMY_API_KEY"),
         "private_key": os.getenv("PRIVATE_KEY"),
         "entry_point": os.getenv("ENTRYPOINT_ADDRESS"),
         "account_factory": os.getenv("ACCOUNT_FACTORY"),

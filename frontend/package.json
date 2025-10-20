@@ -9,16 +9,18 @@
     "start": "next start"
   },
   "dependencies": {
+    "@aa-sdk/core": "^4.73.0",
+    "@aa-sdk/ethers": "^4.73.0",
     "@account-abstraction/contracts": "^0.8.0",
     "@account-abstraction/sdk": "^0.6.0",
-    "@alchemy/aa-accounts": "^3.19.0",
-    "@alchemy/aa-core": "^3.19.0",
-    "@alchemy/aa-ethers": "^3.19.0",
+    "@account-kit/infra": "^4.73.0",
+    "@account-kit/smart-contracts": "^4.73.0",
     "@pythnetwork/price-service-client": "^1.9.0",
     "@pythnetwork/pyth-sdk-solidity": "^4.2.0",
     "dotenv": "^17.2.3",
     "ethers": "^5.8.0",
     "next": "15.5.4",
+    "qrcode.react": "^4.2.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "viem": "^2.38.0",
@@ -32,5 +34,8 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "resolutions": {
+    "viem": "2.7.7"
   }
 }
