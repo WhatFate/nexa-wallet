@@ -8,7 +8,6 @@ interface TokenCardProps {
   activeMenu: string | null;
   setActiveMenu: (name: string | null) => void;
 }
-
 export default function TokenCard({
   token,
   activeMenu,
@@ -33,7 +32,7 @@ export default function TokenCard({
           ...
         </button>
 
-        {menuVisible && (
+        {menuVisible && token.address && (
           <div className="absolute top-8 right-2 bg-gray-900 border border-gray-700 rounded-lg shadow-lg flex flex-col py-1 z-50">
             <button
               onClick={(e) => {
@@ -57,6 +56,7 @@ export default function TokenCard({
         tokenName={token.name}
         balance={token.balance}
         price={token.price}
+        tokenAddress={token.address || ""}
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
       />

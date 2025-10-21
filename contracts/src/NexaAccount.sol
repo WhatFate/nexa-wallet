@@ -10,7 +10,7 @@ import {Ownable} from "@openzeppelin-contracts/contracts/access/Ownable.sol";
 import {MessageHashUtils} from "@openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol";
 
 contract NexaAccount is Ownable {
-    error NexaAccount__NotCalledByEntryPoint();
+    error NexaAccount__NotCalledByEntryPointOrOwner();
     error NexaAccount__TransactionFailed();
     error NexaAccount__InvalidNonce();
 
@@ -20,16 +20,16 @@ contract NexaAccount is Ownable {
     IEntryPoint private immutable i_entryPoint;
     // address private immutable i_uniswapRouter;
 
-    uint256 private nonce;
+    uint256 private _nonce;
 
     constructor(address _entryPoint, /*address uniswapRouter ,*/ address owner) Ownable(owner) {
         i_entryPoint = IEntryPoint(_entryPoint);
         // i_uniswapRouter = uniswapRouter;
     }
 
-    modifier onlyEntryPoint() {
-        if (msg.sender != address(i_entryPoint)) {
-            revert NexaAccount__NotCalledByEntryPoint();
+    modifier onlyEntryPointOrOwner() {
+        if (msg.sender != address(i_entryPoint) && msg.sender != owner()) {
+            revert NexaAccount__NotCalledByEntryPointOrOwner();
         }
         _;
     }
@@ -38,7 +38,7 @@ contract NexaAccount is Ownable {
 
     function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
         external
-        onlyEntryPoint
+        onlyEntryPointOrOwner
         returns (uint256 validationData)
     {
         validationData = _validateSignature(userOp, userOpHash);
@@ -67,13 +67,13 @@ contract NexaAccount is Ownable {
     //     address token1,
     //     address token2,
     //     uint256 amount
-    // ) external payable onlyEntryPoint {}
+    // ) external payable onlyEntryPointOrOwner {}
 
     function transferERC20(
         address target,
         uint256 amount,
         address tokenAddress
-    ) external onlyEntryPoint {
+    ) external onlyEntryPointOrOwner {
         IERC20 erc20 = IERC20(tokenAddress);
         SafeERC20.safeTransfer(erc20, target, amount);
         emit ERC20Transfer(tokenAddress, target, amount);
@@ -82,7 +82,7 @@ contract NexaAccount is Ownable {
     function transferEtherWithCall(
         address target,
         bytes memory callData
-    ) external payable onlyEntryPoint {
+    ) external payable onlyEntryPointOrOwner {
         (bool success, bytes memory returnData) = payable(target).call{value: msg.value}(
             callData
         );
@@ -92,15 +92,20 @@ contract NexaAccount is Ownable {
         emit EtherTransfer(target, msg.value, returnData);
     }
 
-    function _checkAndIncrementNonce(uint256 _nonce) internal {
-        if (_nonce != nonce) {
+    function _checkAndIncrementNonce(uint256 checkNonce) internal {
+        if (checkNonce != _nonce) {
             revert NexaAccount__InvalidNonce();
         }
 
-        unchecked { nonce += 1; }
+        unchecked { _nonce += 1; }
     }
 
     function getEntryPoint() external view returns (address) {
         return address(i_entryPoint);
+    }
+
+    
+    function nonce() public view returns (uint256) {
+        return _nonce;
     }
 }

@@ -1,11 +1,14 @@
 "use client";
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { ethers } from "ethers";
+import ReceiveQR from "@/components/dashboard/ReceiveQR";
+import { sendERC20 } from "@/lib/sendAA";
 
 interface TokenModalProps {
   tokenName: string;
   balance: string;
   price: string;
+  tokenAddress: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -14,15 +17,24 @@ const TokenModal: FC<TokenModalProps> = ({
   tokenName,
   balance,
   price,
+  tokenAddress,
   isOpen,
   onClose,
 }) => {
   const [isSendMode, setIsSendMode] = useState(false);
+  const [isReceiveMode, setIsReceiveMode] = useState(false);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [txStatus, setTxStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
+
+  const [aaAddress, setaaAddress] = useState<string>("");
+
+  useEffect(() => {
+    const aaAddress = localStorage.getItem("aaAddress") || "0x0000...";
+    setaaAddress(aaAddress);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -30,9 +42,11 @@ const TokenModal: FC<TokenModalProps> = ({
     try {
       setTxStatus("sending");
 
-      console.log(`Sending ${amount} ${tokenName} to ${recipient}`);
+      if (!recipient || !amount) return;
 
-      await new Promise((res) => setTimeout(res, 2000));
+      const txHash = await sendERC20(recipient, amount, tokenAddress);
+
+      console.log("Transaction hash:", txHash);
 
       setTxStatus("success");
       setIsSendMode(false);
@@ -75,9 +89,7 @@ const TokenModal: FC<TokenModalProps> = ({
   };
 
   const isValidAddress = (address: string) => ethers.utils.isAddress(address);
-
   const hasEnoughBalance = parseFloat(balance) >= parseFloat(amount || "0");
-
   const isFormValid =
     recipient &&
     isValidAddress(recipient) &&
@@ -113,7 +125,20 @@ const TokenModal: FC<TokenModalProps> = ({
           </div>
         )}
 
-        {!isSendMode ? (
+        {isReceiveMode ? (
+          <>
+            <div className="flex flex-col items-center gap-4 mt-4">
+              <ReceiveQR address={aaAddress} />
+            </div>
+
+            <button
+              onClick={() => setIsReceiveMode(false)}
+              className="mt-6 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-white font-semibold transition"
+            >
+              Back
+            </button>
+          </>
+        ) : !isSendMode ? (
           <>
             <div className="text-center">
               <h2 className="text-3xl font-bold">{tokenName}</h2>
@@ -127,7 +152,10 @@ const TokenModal: FC<TokenModalProps> = ({
               >
                 Send
               </button>
-              <button className="flex-1 bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg text-white font-semibold transition">
+              <button
+                onClick={() => setIsReceiveMode(true)}
+                className="flex-1 bg-green-700 hover:bg-green-800 px-4 py-2 rounded-lg text-white font-semibold transition"
+              >
                 Receive
               </button>
             </div>
@@ -199,7 +227,7 @@ const TokenModal: FC<TokenModalProps> = ({
               />
               {amount && !hasEnoughBalance && (
                 <p className="text-red-400 text-sm">
-                  Insufficient balance. You only have {}
+                  Insufficient balance. You only have {balance}
                 </p>
               )}
             </div>

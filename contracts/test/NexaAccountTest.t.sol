@@ -2,7 +2,7 @@
 pragma solidity 0.8.28;
 
 import {NexaAccount} from "../src/NexaAccount.sol";
-import {Test} from "@forge-std/src/Test.sol";
+import {Test} from "lib/forge-std/src/Test.sol";
 
 contract NexaAccountTest is Test {
     NexaAccount nexaAccount;

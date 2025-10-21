@@ -5,6 +5,9 @@ export interface User {
 
 export interface Token {
   name: string;
+  symbol: string;
   balance: string;
   price: string;
+  address?: string;
+  decimals: number;
 }

@@ -80,26 +80,44 @@ export default function Dashboard() {
 
   if (!user)
     return <div className="text-white text-center mt-20">Loading...</div>;
-
   const tokens: Token[] = [
     {
       name: "Ethereum",
+      symbol: "ETH",
       balance: balances ? `${balances.eth.toFixed(4)} ETH` : "Loading...",
-      price: tokenPrices.ETH ? `$${tokenPrices.ETH.toFixed(2)}` : "Loading...",
+      price:
+        balances && tokenPrices.ETH
+          ? balances.eth > 0
+            ? `$${(balances.eth * tokenPrices.ETH).toFixed(2)}`
+            : "$0.00"
+          : "Loading...",
+      decimals: 18,
     },
     {
       name: tokenNames.USDC || "USDC",
+      symbol: "USDC",
       balance: balances ? `${balances.usdc.toFixed(2)} USDC` : "Loading...",
-      price: tokenPrices.USDC
-        ? `$${tokenPrices.USDC.toFixed(2)}`
-        : "Loading...",
+      price:
+        balances && tokenPrices.USDC
+          ? balances.usdc > 0
+            ? `$${(balances.usdc * tokenPrices.USDC).toFixed(2)}`
+            : "$0.00"
+          : "Loading...",
+      address: tokenAddresses.USDC,
+      decimals: 6,
     },
     {
-      name: tokenNames.WETH || "WETH",
+      name: tokenNames.WETH || "Wrapped Ether",
+      symbol: "WETH",
       balance: balances ? `${balances.weth.toFixed(2)} WETH` : "Loading...",
-      price: tokenPrices.WETH
-        ? `$${tokenPrices.WETH.toFixed(2)}`
-        : "Loading...",
+      price:
+        balances && tokenPrices.WETH
+          ? balances.weth > 0
+            ? `$${(balances.weth * tokenPrices.WETH).toFixed(2)}`
+            : "$0.00"
+          : "Loading...",
+      address: tokenAddresses.WETH,
+      decimals: 18,
     },
   ];
 
