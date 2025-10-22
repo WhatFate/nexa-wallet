@@ -60,7 +60,7 @@ export default function LogIn() {
       localStorage.setItem("aaAddress", loginData.aaAddress);
       localStorage.setItem("username", username);
 
-      router.push("/dashboard");
+      router.push("/dashboard/wallet");
     } catch (err) {
       console.error("Login error:", err);
       setMessage("Failed to log in. Please try again.");

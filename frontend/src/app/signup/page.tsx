@@ -80,7 +80,7 @@ export default function SignUp() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/dashboard/wallet");
     } catch (err) {
       console.error("Error in SignUp:", err);
       setMessage("Failed to create wallets. Check console.");
