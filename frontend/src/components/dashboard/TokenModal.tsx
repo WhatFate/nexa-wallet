@@ -2,7 +2,7 @@
 import { FC, useState, useEffect } from "react";
 import { ethers } from "ethers";
 import ReceiveQR from "@/components/dashboard/ReceiveQR";
-import { sendERC20 } from "@/lib/sendAA";
+import { sendERC20, sendEther } from "@/lib/sendAA";
 
 interface TokenModalProps {
   tokenName: string;
@@ -43,10 +43,11 @@ const TokenModal: FC<TokenModalProps> = ({
       setTxStatus("sending");
 
       if (!recipient || !amount) return;
-
-      const txHash = await sendERC20(recipient, amount, tokenAddress);
-
-      console.log("Transaction hash:", txHash);
+      if (!tokenAddress) {
+        await sendEther(recipient, amount);
+      } else {
+        await sendERC20(recipient, amount, tokenAddress);
+      }
 
       setTxStatus("success");
       setIsSendMode(false);
@@ -106,7 +107,7 @@ const TokenModal: FC<TokenModalProps> = ({
           className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full hover:bg-red-600 text-white font-bold text-lg transition-all shadow-md"
           title="Close"
         >
-          x
+          ✕
         </button>
 
         {txStatus !== "idle" && (

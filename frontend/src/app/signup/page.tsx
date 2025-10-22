@@ -34,7 +34,7 @@ export default function SignUp() {
       }
 
       const checkRes = await fetch(
-        "http://127.0.0.1:5000/api/user/check-username",
+        "http://127.0.0.1:8001/flask/api/user/check-username",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -61,7 +61,7 @@ export default function SignUp() {
       localStorage.setItem("username", username);
 
       const registerRes = await fetch(
-        "http://127.0.0.1:5000/api/user/register",
+        "http://localhost:8001/flask/api/user/register",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

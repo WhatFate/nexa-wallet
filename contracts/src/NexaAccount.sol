@@ -81,15 +81,16 @@ contract NexaAccount is Ownable {
 
     function transferEtherWithCall(
         address target,
+        uint256 amount,
         bytes memory callData
     ) external payable onlyEntryPointOrOwner {
-        (bool success, bytes memory returnData) = payable(target).call{value: msg.value}(
+        (bool success, bytes memory returnData) = payable(target).call{value: amount}(
             callData
         );
         if (!success) {
             revert NexaAccount__TransactionFailed();
         }
-        emit EtherTransfer(target, msg.value, returnData);
+        emit EtherTransfer(target, amount, returnData);
     }
 
     function _checkAndIncrementNonce(uint256 checkNonce) internal {

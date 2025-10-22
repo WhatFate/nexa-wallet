@@ -26,7 +26,7 @@ export default function LogIn() {
 
     try {
       const checkRes = await fetch(
-        "http://127.0.0.1:5000/api/user/check-username",
+        "http://127.0.0.1:8001/flask/api/user/check-username",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -42,11 +42,14 @@ export default function LogIn() {
 
       const eoaAddress = (await createEOAWallet(username, password)).address;
 
-      const loginRes = await fetch("http://127.0.0.1:5000/api/user/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, eoaAddress }),
-      });
+      const loginRes = await fetch(
+        "http://127.0.0.1:8001/flask/api/user/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, eoaAddress }),
+        }
+      );
       const loginData = await loginRes.json();
 
       if (!loginData.success) {
