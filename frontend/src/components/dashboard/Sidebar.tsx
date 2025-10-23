@@ -27,7 +27,7 @@ export default function Sidebar() {
           History
         </Link>
         <Link
-          href="#"
+          href="/dashboard/settings"
           className="flex items-center justify-center gap-3 py-4 rounded-xl bg-[#1e3a8a] hover:bg-[#2a4dbf] shadow-md hover:shadow-blue-500/40 transition-all text-lg font-medium text-gray-100"
         >
           Settings
