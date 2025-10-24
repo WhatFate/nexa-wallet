@@ -1,79 +1,70 @@
 # Nexa Wallet
 
-**Nexa Wallet** is an Account Abstraction-enabled smart wallet designed to simplify cryptocurrency management for beginners and provide a seamless user experience. The project integrates an **AI Agent**, **Blockscout MCP**, and **Avail Nexus SDK**, allowing users to get intelligent insights about their transactions and tokens directly in the chat while performing cross-chain operations seamlessly.
+**Nexa Wallet** is an **Account Abstraction (AA)** smart wallet built to make crypto management simple, secure, and intuitive.
+It combines an **AI Agent**, **real-time token prices from Pyth Network**, and a clean modern interface for sending, receiving, and swapping assets.
 
 ## Key Features
 
-### 1. DeFi & Cross-Chain Integration
-- Users can select from available DeFi projects (e.g., UniSwap) and swap cryptocurrencies directly on the platform.
-- Supports cross-chain operations using **Avail Nexus SDK** for:
-  - Transferring tokens between Ethereum, Polygon, and other networks.
-  - Unified gas refuel and cross-chain swaps (XCS).
-  - "Bridge & Execute" functionality to combine multiple actions into one transaction.
+### 1. Account Abstraction Smart Wallet
+* Smart-contract–based wallet creation and management.
+* Send and receive **ETH** and **ERC-20 tokens** easily.
+* Built with **AA transactions**, removing the need to handle private keys directly.
 
-### 2. AI Agent with On-Chain Data
-- Built-in AI agent (uAgent via ASI:One) answers user questions in chat.
-- Capabilities include:
-  - Querying user balances and token holdings.
-  - Displaying recent transaction history via Blockscout MCP.
-  - Analyzing wallet activity across DeFi protocols and cross-chain operations.
-  - Explaining smart contracts and transactions in plain language.
+### 2. AI Agent (uAgent via ASI:One)
+* Integrated AI assistant available on every page.
+* Helps users navigate the wallet, explains actions, and answers questions in chat.
+* Example dialogue:
+  > User: ”How can I send tokens?” 
+  > AI Agent: ”Just click ‘Send’, choose a token, and confirm your transaction. I’ll handle the rest!” 
 
-### 3. Transaction History
-- Blockscout MCP provides verified on-chain transaction data.
-- The AI agent can answer questions like:
-  > “What was my last wallet transaction?”  
-  > “How do I transfer tokens between Ethereum and other networks?”  
-  > “What is the current value of my portfolio?”
+### 3. Real-Time Token Prices (Pyth Network)
 
-## User Flow
+* Integrated with **Pyth Network** to display accurate market prices for each token.
+* Users can see their total portfolio value in **USD** and **ETH**, updated live.
 
-### 1. Wallet Creation
-- Users sign up on the site.
-- Choose a unique wallet name linked to a smart contract address.
-- Set a wallet password.
-- Gas fees for wallet creation are covered by the project’s main smart contract.
+### 4. Token Management & Swaps
 
-### 2. Using the Wallet
-Currently supports **Ethereum Sepolia** network and cross-chain operations.  
-Main functionalities:
-- **Send Crypto** — send tokens across supported networks.
-- **Receive Crypto** — display smart contract address for receiving funds.
-- **Swap** — swap tokens via UniSwap or other supported protocols.
-- **Bridge & Execute** — transfer tokens and execute multiple operations in a single transaction via Avail Nexus SDK.
-- **Stake** — stake tokens in supported DeFi protocols.
-- **DeFi Hub** — browse available DeFi projects and services.
-- **Settings** — manage wallet password, notifications, and preferences.
-- **History** — view transaction history with AI-generated insights.
-- **Portfolio Value** — check balances and token holdings in real-time.
+* Supports **ETH ↔ WETH swaps** directly within the wallet.
+* Separate views for **Send**, **Receive**, and **Token Details**.
+* Fast, intuitive, and minimal UI designed for everyday use.
+* 
+### 5. Settings
 
-### 3. AI Agent
-- A chat interface is available on every page.
-- Provides insights into transactions, token holdings, and cross-chain operations.
-- Uses Blockscout MCP and Avail Nexus SDK to fetch verified on-chain data.
-- Explains smart contract actions and DeFi protocol operations in plain language.
+* Includes a **Log Out** button that clears local storage and redirects to the homepage.
+* Future updates will add theme switching, wallet import/recovery, and security controls.
 
+## Current Functionality
 
-## Technologies & Integrations
-
-| Technology / Project                  | Role in Nexa Wallet                                                  | Examples |
-| ------------------------------------ | ------------------------------------------------------------------- | ------- |
-| **AI Agent (uAgent via ASI:One)**    | Answers user questions, explains transactions and smart contracts   | Chat bot: “What was my last transaction?”, analyzes DeFi activity |
-| **Blockscout MCP**                    | Provides verified on-chain transaction history and balances        | Displays recent transactions, calculates received ETH |
-| **Avail Nexus SDK**                   | Enables cross-chain operations, unified access to on-chain assets, and advanced DeFi interactions | Bridge & Execute, cross-chain swaps (XCS), unified gas refuel, deposit assets across networks |
-
-## Future Roadmap
-
-| Status | Feature | Description |
-|--------|---------|-------------|
-| ✅ **Completed** | Wallet Structure & Account Abstraction | Minimal smart contract wallet deployed; basic frontend landing page with login/signup. |
-| ⚙️ **In Progress**     | DeFi & Cross-Chain Skeleton | Basic Swap, Send/Receive buttons in frontend; Avail Nexus SDK structure integrated for future cross-chain operations. |
-| ✅ **Completed**     | AI Agent Interface | Chat UI implemented (currently placeholder, non-functional), ready for future AI integration. |
-| ⏳ **Planned**     | Transaction History | Integrating Blockscout MCP to fetch verified on-chain data and display user transactions in frontend. |
-| ⚙️ **In Progress**     | AI Agent Logic | Connecting AI agent to on-chain data, preparing responses for wallet queries and DeFi operations. |
-| ⏳ **Planned**     | Cross-Chain Features | Testing Avail Nexus SDK “Bridge & Execute” and cross-chain swap functionalities. |
-| ⏳ **Planned**     | Full DeFi Hub | Display all available DeFi projects, swap options, staking, and analytics dashboards. |
-| ⏳ **Planned**     | Portfolio Management | Real-time portfolio value, asset allocation, advanced analytics with AI insights. |
-| ⏳ **Planned**     | Multi-Network Support | Expand beyond Ethereum Sepolia to Polygon and other chains, fully integrated via Avail Nexus SDK. |
+| Status             | Feature                    | Description                                                          |
+| ------------------ | -------------------------- | -------------------------------------------------------------------- |
+| ✅ **Completed**    | Account Abstraction Wallet | Smart contract wallet deployed with signup and account management.   |
+| ✅ **Completed**    | Send / Receive / Swap      | Core token and ETH/WETH transfer and swap functionality implemented. |
+| ⚙️ **In Progress** | AI Agent Chat              | Chat UI functional, logic integration with uAgent (ASI:One) ongoing. |
+| ✅ **Completed**    | Token Prices               | Integrated **Pyth Network** for real-time token price data.          |
+| ⚙️ **In Progress** | Settings Page              | Added settings screen with a working **Log Out** feature.            |
+| ⏳ **Planned**      | Portfolio Dashboard        | Display token balances, total value, and analytics.                  |
+| ⏳ **Planned**      | DeFi Integrations          | Add staking, liquidity pools, and token swaps with DeFi protocols.   |
 | ⏳ **Planned**     | Advanced AI Features | Smart contract explanations, cross-chain operation guidance, personalized DeFi recommendations. |
 
+## Example User Flow
+
+1. The user creates an **Account Abstraction wallet**.
+2. The dashboard displays all tokens and their live USD/ETH values via **Pyth Network**.
+3. Through the **AI Chat**, the user can ask:
+
+   > “What’s my wallet balance in dollars?”
+   > “How do I swap my ETH to WETH?”
+4. The user sends or receives tokens in one click.
+5. To exit, they go to **Settings → Log Out**, which clears all local data securely.
+
+## Roadmap
+
+* 🔜 Transaction history with AI analysis
+* 🔜 Multi-chain support (Polygon, Base, Arbitrum)
+* 🔜 AI-powered DeFi insights and recommendations
+* 🔜 Portfolio tracking and on-chain analytics
+* 🔜 Full DeFi hub (swap, stake, bridge)
+
+## License
+
+MIT License © 2025 Nexa Wallet

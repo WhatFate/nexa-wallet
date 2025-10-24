@@ -11,3 +11,13 @@ export interface Token {
   address?: string;
   decimals: number;
 }
+
+export interface TokenModalProps {
+  tokenName: string;
+  symbol: string;
+  balance: string;
+  price: string;
+  tokenAddress: string;
+  isOpen: boolean;
+  onClose: () => void;
+}

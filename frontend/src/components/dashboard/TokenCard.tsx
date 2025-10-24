@@ -1,5 +1,5 @@
 "use client";
-import TokenModal from "./TokenModal";
+import TokenModal from "./TokenModal/TokenModal";
 import { Token } from "../../types";
 import { useState } from "react";
 
@@ -54,6 +54,7 @@ export default function TokenCard({
 
       <TokenModal
         tokenName={token.name}
+        symbol={token.symbol}
         balance={token.balance}
         price={token.price}
         tokenAddress={token.address || ""}

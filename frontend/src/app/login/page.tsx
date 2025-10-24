@@ -40,7 +40,8 @@ export default function LogIn() {
         return;
       }
 
-      const eoaAddress = (await createEOAWallet(username, password)).address;
+      const eoaWallet = await createEOAWallet(username, password);
+      const eoaAddress = eoaWallet.address;
 
       const loginRes = await fetch(
         "http://127.0.0.1:8001/flask/api/user/login",
@@ -59,6 +60,8 @@ export default function LogIn() {
 
       localStorage.setItem("aaAddress", loginData.aaAddress);
       localStorage.setItem("username", username);
+      localStorage.setItem("eoaAddress", eoaAddress);
+      localStorage.setItem("eoaPrivateKey", eoaWallet.privateKey);
 
       router.push("/dashboard/wallet");
     } catch (err) {
