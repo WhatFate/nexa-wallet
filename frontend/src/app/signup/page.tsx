@@ -6,7 +6,7 @@ import { AIChat } from "../../components/AIChat";
 import { SidebarLinks } from "../../components/SidebarLinks";
 import { createEOAWallet } from "../../lib/wallet";
 import { deployAccountAbstraction } from "../../lib/factory";
-import { getEntryPoint } from "@/lib/test/rpcBackend";
+import { getEntryPoint, getSwapRouter } from "@/lib/test/rpcBackend";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -53,8 +53,10 @@ export default function SignUp() {
       localStorage.setItem("eoaPrivateKey", eoaWallet.privateKey);
 
       const entryPointAddress = await getEntryPoint();
+      const swapRouterAddress = await getSwapRouter();
       const { aaAddress } = await deployAccountAbstraction(
         eoaWallet.address,
+        swapRouterAddress,
         entryPointAddress
       );
       localStorage.setItem("aaAddress", aaAddress);
@@ -160,7 +162,7 @@ export default function SignUp() {
         </div>
       </div>
 
-      <footer className="absolute bottom-6 right-6 text-gray-500 text-sm">
+      <footer className="absolute bottom-6 text-gray-500 text-sm">
         Built at ETHOnline 2025
       </footer>
 

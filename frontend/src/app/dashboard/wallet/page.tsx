@@ -109,7 +109,7 @@ export default function Dashboard() {
     {
       name: tokenNames.WETH || "Wrapped Ether",
       symbol: "WETH",
-      balance: balances ? `${balances.weth.toFixed(2)} WETH` : "Loading...",
+      balance: balances ? `${balances.weth.toFixed(4)} WETH` : "Loading...",
       price:
         balances && tokenPrices.WETH
           ? balances.weth > 0

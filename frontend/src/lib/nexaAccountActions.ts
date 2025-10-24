@@ -14,9 +14,13 @@ export async function sendERC20(
   const nexaContract = new ethers.Contract(aaAddress, NEXA_ACCOUNT_ABI, signer);
 
   const decimals = await tokenContract.decimals();
-  const value = ethers.utils.parseUnits(amount, decimals);
+  const parsedAmount = ethers.utils.parseUnits(amount, decimals);
 
-  const tx = await nexaContract.transferERC20(target, value, tokenAddress);
+  const tx = await nexaContract.transferERC20(
+    target,
+    parsedAmount,
+    tokenAddress
+  );
   const receipt = await tx.wait();
 
   return receipt.transactionHash;
@@ -28,10 +32,14 @@ export async function sendEther(target: string, amount: string) {
   const nexaContract = new ethers.Contract(aaAddress, NEXA_ACCOUNT_ABI, signer);
 
   const decimals = 18;
-  const value = ethers.utils.parseUnits(amount, decimals);
+  const parsedAmount = ethers.utils.parseUnits(amount, decimals);
   const data = "0x";
 
-  const tx = await nexaContract.transferEtherWithCall(target, value, data);
+  const tx = await nexaContract.transferEtherWithCall(
+    target,
+    parsedAmount,
+    data
+  );
   const receipt = await tx.wait();
 
   return receipt.transactionHash;
@@ -42,33 +50,22 @@ export async function swap(
   tokenOut: string,
   amountIn: string
 ) {
+  if (!tokenIn) {
+    await swapEthToWeth(amountIn);
+    tokenIn = "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14";
+  }
   const { aaAddress, signer } = await getDependencies();
-  const UNISWAP_FACTORY_ADDRESS = "0x0227628f3F023bb0B980b67D528571c95c6DaC1c";
   const fee = 100;
+  const tokenContract = new ethers.Contract(tokenIn, ERC20_ABI, signer);
+  const decimals = await tokenContract.decimals();
 
-  const UNISWAP_FACTORY_ABI = [
-    "function getPool(address tokenA, address tokenB, uint24 fee) external view returns (address)",
-  ];
+  const nexaContract = new ethers.Contract(aaAddress, NEXA_ACCOUNT_ABI, signer);
+  const parsedAmountIn = ethers.utils.parseUnits(amountIn, decimals);
 
-  const uniswapFactoryInterface = new ethers.utils.Interface(
-    UNISWAP_FACTORY_ABI
-  );
+  const tx = await nexaContract.swap(tokenIn, tokenOut, parsedAmountIn, fee);
+  const receipt = await tx.wait();
 
-  const poolAddress = await signer.call({
-    to: UNISWAP_FACTORY_ADDRESS,
-    data: uniswapFactoryInterface.encodeFunctionData("getPool", [
-      tokenIn,
-      tokenOut,
-      fee,
-    ]),
-  });
-
-  const [decodedPool] = uniswapFactoryInterface.decodeFunctionResult(
-    "getPool",
-    poolAddress
-  );
-
-  return decodedPool;
+  return receipt.transactionHash;
 }
 
 export async function swapEthToWeth(amount: string) {

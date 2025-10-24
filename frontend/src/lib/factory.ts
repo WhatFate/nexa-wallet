@@ -5,6 +5,7 @@ import { getFactoryAddress } from "./test/rpcBackend";
 
 export async function deployAccountAbstraction(
   ownerAddress: string,
+  swapRouterAddress: string,
   entryPointAddress: string
 ) {
   const FACTORY_ADDRESS = await getFactoryAddress();
@@ -14,7 +15,11 @@ export async function deployAccountAbstraction(
     NEXA_FACTORY_ABI,
     signer
   );
-  const tx = await factory.createAccount(entryPointAddress, ownerAddress);
+  const tx = await factory.createAccount(
+    entryPointAddress,
+    swapRouterAddress,
+    ownerAddress
+  );
 
   const receipt = await tx.wait();
 

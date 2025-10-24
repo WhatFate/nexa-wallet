@@ -3,6 +3,8 @@ import { ethers } from "ethers";
 interface DevConfig {
   account_factory: string;
   entry_point: string;
+  swap_router: string;
+  api_key: string;
   private_key: string;
   rpc_url: string;
   salt: string;
@@ -10,69 +12,59 @@ interface DevConfig {
 
 let cachedConfig: DevConfig | null = null;
 
-async function fetchBackendConfig() {
+const BACKEND_URL = "http://localhost:8001/flask/api/get-env";
+
+async function fetchBackendConfig(): Promise<DevConfig> {
   if (cachedConfig) return cachedConfig;
 
   try {
-    const response = await fetch("http://localhost:8001/flask/api/get-env");
-    if (!response.ok) throw new Error("Failed to fetch backend config");
+    const res = await fetch(BACKEND_URL);
+    if (!res.ok) throw new Error(`Backend returned ${res.status}`);
 
-    const data = await response.json();
-    if (
-      !data.account_factory ||
-      !data.api_key ||
-      !data.entry_point ||
-      !data.private_key ||
-      !data.rpc_url ||
-      !data.salt
-    )
-      throw new Error("Invalid backend config response");
+    const data = await res.json();
+
+    const requiredKeys: (keyof DevConfig)[] = [
+      "account_factory",
+      "entry_point",
+      "swap_router",
+      "api_key",
+      "private_key",
+      "rpc_url",
+      "salt",
+    ];
+
+    for (const key of requiredKeys) {
+      if (!data[key]) throw new Error(`Missing key in backend config: ${key}`);
+    }
 
     cachedConfig = data;
     return data;
   } catch (err) {
-    console.error("Backend config fetch failed:", err);
+    console.error("Failed to fetch backend config:", err);
     throw err;
   }
 }
 
-export const getProvider = async () => {
-  const { rpc_url } = await fetchBackendConfig();
-  return new ethers.providers.JsonRpcProvider(rpc_url);
+const getConfigValue = async <K extends keyof DevConfig>(
+  key: K
+): Promise<DevConfig[K]> => {
+  const config = await fetchBackendConfig();
+  return config[key];
 };
 
-export const getRpcUrl = async () => {
-  const { rpc_url } = await fetchBackendConfig();
-  return rpc_url;
-};
+export const getProvider = async () =>
+  new ethers.providers.JsonRpcProvider(await getConfigValue("rpc_url"));
 
-export const getApiKey = async () => {
-  const { api_key } = await fetchBackendConfig();
-  return api_key;
-};
+export const getRpcUrl = () => getConfigValue("rpc_url");
+export const getApiKey = () => getConfigValue("api_key");
+export const getPrivateKey = () => getConfigValue("private_key");
+export const getEntryPoint = () => getConfigValue("entry_point");
+export const getSwapRouter = () => getConfigValue("swap_router");
+export const getFactoryAddress = () => getConfigValue("account_factory");
+export const getSalt = () => getConfigValue("salt");
 
 export const getDevSigner = async () => {
-  const { private_key } = await fetchBackendConfig();
   const provider = await getProvider();
-  return new ethers.Wallet(private_key, provider);
-};
-
-export const getPrivateKey = async () => {
-  const { private_key } = await fetchBackendConfig();
-  return private_key;
-};
-
-export const getEntryPoint = async () => {
-  const { entry_point } = await fetchBackendConfig();
-  return entry_point;
-};
-
-export const getFactoryAddress = async () => {
-  const { account_factory } = await fetchBackendConfig();
-  return account_factory;
-};
-
-export const getSalt = async () => {
-  const { salt } = await fetchBackendConfig();
-  return salt;
+  const privateKey = await getConfigValue("private_key");
+  return new ethers.Wallet(privateKey, provider);
 };

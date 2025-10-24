@@ -24,6 +24,7 @@ def get_env():
         "api_key": os.getenv("ALCHEMY_API_KEY"),
         "private_key": os.getenv("PRIVATE_KEY"),
         "entry_point": os.getenv("ENTRYPOINT_ADDRESS"),
+        "swap_router": os.getenv("SWAPROUTER_ADDRESS"),
         "account_factory": os.getenv("ACCOUNT_FACTORY"),
         "salt": os.getenv("SALT"),
     }

@@ -2,6 +2,8 @@
 pragma solidity 0.8.28;
 
 import {IEntryPoint} from "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
+import {ISwapRouter} from "./interface/ISwapRouter.sol";
+import {IERC20} from "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {ECDSA} from "@openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import {PackedUserOperation} from "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "@account-abstraction/contracts/core/Helpers.sol";
@@ -22,9 +24,9 @@ contract NexaAccount is Ownable {
 
     uint256 private _nonce;
 
-    constructor(address _entryPoint, /*address uniswapRouter ,*/ address owner) Ownable(owner) {
+    constructor(address _entryPoint, address uniswapRouter , address owner) Ownable(owner) {
         i_entryPoint = IEntryPoint(_entryPoint);
-        // i_uniswapRouter = uniswapRouter;
+        i_uniswapRouter = uniswapRouter;
     }
 
     modifier onlyEntryPointOrOwner() {
@@ -36,11 +38,11 @@ contract NexaAccount is Ownable {
 
     receive() external payable {}
 
-    function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
-        external
-        onlyEntryPointOrOwner
-        returns (uint256 validationData)
-    {
+    function validateUserOp(
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash,
+        uint256 missingAccountFunds
+    ) external onlyEntryPointOrOwner returns (uint256 validationData) {
         validationData = _validateSignature(userOp, userOpHash);
         _checkAndIncrementNonce(userOp.nonce);
 
@@ -50,24 +52,25 @@ contract NexaAccount is Ownable {
         }
     }
 
-    function _validateSignature(PackedUserOperation calldata userOp, bytes32 userOpHash)
-        internal
-        view
-        returns (uint256 validationData)
-    {
-        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(userOpHash);
-        address signer = ECDSA.recover(ethSignedMessageHash, userOp.signature);
-        if (signer != owner()) {
-            return SIG_VALIDATION_FAILED;
-        }
-        return SIG_VALIDATION_SUCCESS;
+    function swap(
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint24 fee
+    ) external onlyEntryPointOrOwner returns (uint256) {
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+            tokenIn: tokenIn,
+            tokenOut: tokenOut,
+            fee: fee,
+            recipient: address(this),
+            amountIn: amountIn,
+            amountOutMinimum: 0,
+            sqrtPriceLimitX96: 0
+        });
+        IERC20(tokenIn).approve(i_uniswapRouter, amountIn);
+        uint256 amountOut = ISwapRouter(i_uniswapRouter).exactInputSingle(params);
+        return amountOut;
     }
-
-    // function swap(
-    //     address token1,
-    //     address token2,
-    //     uint256 amountIn
-    // ) external payable onlyEntryPointOrOwner {}
 
     function transferERC20(
         address target,
@@ -84,29 +87,31 @@ contract NexaAccount is Ownable {
         uint256 amount,
         bytes memory callData
     ) external payable onlyEntryPointOrOwner {
-        (bool success, bytes memory returnData) = payable(target).call{value: amount}(
-            callData
-        );
-        if (!success) {
-            revert NexaAccount__TransactionFailed();
-        }
+        (bool success, bytes memory returnData) = payable(target).call{value: amount}(callData);
+        if (!success) revert NexaAccount__TransactionFailed();
         emit EtherTransfer(target, amount, returnData);
-    }
-
-    function _checkAndIncrementNonce(uint256 checkNonce) internal {
-        if (checkNonce != _nonce) {
-            revert NexaAccount__InvalidNonce();
-        }
-
-        unchecked { _nonce += 1; }
     }
 
     function getEntryPoint() external view returns (address) {
         return address(i_entryPoint);
     }
 
-    
     function nonce() public view returns (uint256) {
         return _nonce;
+    }
+
+    function _validateSignature(
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash
+    ) internal view returns (uint256 validationData) {
+        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(userOpHash);
+        address signer = ECDSA.recover(ethSignedMessageHash, userOp.signature);
+        if (signer != owner()) return SIG_VALIDATION_FAILED;
+        return SIG_VALIDATION_SUCCESS;
+    }
+
+    function _checkAndIncrementNonce(uint256 checkNonce) internal {
+        if (checkNonce != _nonce) revert NexaAccount__InvalidNonce();
+        unchecked { _nonce += 1; }
     }
 }

@@ -130,7 +130,7 @@ export default function LogIn() {
         </div>
       </div>
 
-      <footer className="absolute bottom-6 right-6 text-gray-500 text-sm">
+      <footer className="absolute bottom-6 text-gray-500 text-sm">
         Built at ETHOnline 2025
       </footer>
 

@@ -9,5 +9,6 @@ class Config:
     PRIVATE_KEY = os.getenv("PRIVATE_KEY")
     ENTRY_POINT_ADDRESS = os.getenv("ENTRYPOINT_ADDRESS")
     ACCOUNT_FACTORY = os.getenv("ACCOUNT_FACTORY")
+    SWAPROUTER_ADDRESS = os.getenv("SWAPROUTER_ADDRESS")
     SALT = os.getenv("SALT")
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
