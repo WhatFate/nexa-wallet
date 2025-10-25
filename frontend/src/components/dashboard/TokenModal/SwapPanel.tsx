@@ -6,14 +6,21 @@ import {
 } from "@/lib/amountHandlers";
 import { swap } from "@/lib/nexaAccountActions";
 import { useState } from "react";
+import { validateAmount } from "@/lib/validations";
 
 type SwapPanelProps = {
   symbol: string;
   tokenIn: string;
+  balance: string;
   onBack: () => void;
 };
 
-export default function SwapPanel({ symbol, tokenIn, onBack }: SwapPanelProps) {
+export default function SwapPanel({
+  symbol,
+  tokenIn,
+  balance,
+  onBack,
+}: SwapPanelProps) {
   const [txStatus, setTxStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
@@ -21,7 +28,12 @@ export default function SwapPanel({ symbol, tokenIn, onBack }: SwapPanelProps) {
   const [amountIn, setAmountIn] = useState("");
 
   const isProcessing = txStatus === "sending";
-  const isValid = amountIn && parseFloat(amountIn) > 0;
+  const isValid =
+    amountIn &&
+    parseFloat(amountIn) > 0 &&
+    validateAmount(amountIn, balance) &&
+    tokenOut !== "";
+
   const handleSwap = async () => {
     try {
       setTxStatus("sending");
@@ -64,9 +76,10 @@ export default function SwapPanel({ symbol, tokenIn, onBack }: SwapPanelProps) {
         onChange={(e) => setTokenOut(e.target.value)}
         className="p-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
+        <option value="">Select token...</option>
+        <option value="0x0000000000000000000000000000000000000000">ETH</option>
         <option value="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238">USDC</option>
         <option value="0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14">WETH</option>
-        <option value="">ETH</option>
       </select>
 
       <label className="text-gray-300 text-sm font-semibold">
@@ -80,8 +93,17 @@ export default function SwapPanel({ symbol, tokenIn, onBack }: SwapPanelProps) {
         onKeyDown={(e) => handleAmountKeyDown(e, amountIn, setAmountIn)}
         placeholder="0.0"
         inputMode="decimal"
-        className="p-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`p-2 rounded-lg bg-gray-800 text-white border ${
+          amountIn && !validateAmount(amountIn, balance)
+            ? "border-red-500 focus:ring-red-500"
+            : "border-gray-700 focus:ring-blue-500"
+        } focus:outline-none focus:ring-2`}
       />
+      {amountIn && !validateAmount(amountIn, balance) && (
+        <p className="text-red-400 text-sm">
+          Insufficient balance. You only have {balance} {symbol}
+        </p>
+      )}
 
       <div className="flex justify-between gap-4 mt-4">
         <button

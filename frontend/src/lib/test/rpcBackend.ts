@@ -1,11 +1,11 @@
 import { ethers } from "ethers";
+import { get } from "http";
 
 interface DevConfig {
   account_factory: string;
   entry_point: string;
   swap_router: string;
   api_key: string;
-  private_key: string;
   rpc_url: string;
   salt: string;
 }
@@ -28,7 +28,6 @@ async function fetchBackendConfig(): Promise<DevConfig> {
       "entry_point",
       "swap_router",
       "api_key",
-      "private_key",
       "rpc_url",
       "salt",
     ];
@@ -57,7 +56,6 @@ export const getProvider = async () =>
 
 export const getRpcUrl = () => getConfigValue("rpc_url");
 export const getApiKey = () => getConfigValue("api_key");
-export const getPrivateKey = () => getConfigValue("private_key");
 export const getEntryPoint = () => getConfigValue("entry_point");
 export const getSwapRouter = () => getConfigValue("swap_router");
 export const getFactoryAddress = () => getConfigValue("account_factory");
@@ -65,6 +63,10 @@ export const getSalt = () => getConfigValue("salt");
 
 export const getDevSigner = async () => {
   const provider = await getProvider();
-  const privateKey = await getConfigValue("private_key");
+  const privateKey = localStorage.getItem("eoaPrivateKey");
+  if (!privateKey) {
+    console.error("Private key not found in localStorage");
+    return;
+  }
   return new ethers.Wallet(privateKey, provider);
 };

@@ -47,6 +47,7 @@ const TokenModal: FC<TokenModalProps> = ({
           <SwapPanel
             symbol={symbol}
             tokenIn={tokenAddress}
+            balance={balance}
             onBack={() => setIsSwapMode(false)}
           />
         ) : isSendMode ? (
