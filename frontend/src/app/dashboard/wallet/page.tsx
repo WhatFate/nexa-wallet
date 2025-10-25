@@ -157,7 +157,7 @@ export default function Dashboard() {
               className={`text-sm px-4 py-2 rounded-lg ${
                 loading
                   ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-blue-700 hover:bg-blue-800"
+                  : "bg-blue-700 hover:bg-blue-800 cursor-pointer"
               } transition`}
             >
               {loading ? "Refreshing..." : "Refresh All"}

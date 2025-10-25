@@ -69,7 +69,7 @@ export const AIChat = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full shadow-lg transition-all transform hover:scale-105"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full shadow-lg transition-all transform hover:scale-105 cursor-pointer"
         >
           AI Chat
         </button>
@@ -159,7 +159,7 @@ export const AIChat = () => {
               className={`px-3 sm:px-4 py-2 rounded-lg font-semibold text-white shrink-0 transition-all ${
                 loading
                   ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
               }`}
             >
               Send

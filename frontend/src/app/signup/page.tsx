@@ -140,7 +140,7 @@ export default function SignUp() {
             className={`w-full py-2 rounded-lg text-white font-semibold transition ${
               loading
                 ? "bg-blue-500/60 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
             }`}
           >
             {loading ? "Creating Wallet..." : "Sign Up"}
