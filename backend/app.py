@@ -5,9 +5,7 @@ from flask_cors import CORS
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from server import get_asi1_response
-from decimal import Decimal
 from web3 import Web3, HTTPProvider
-
 
 from routes.user_routes import user_bp
 from fastapi.middleware.wsgi import WSGIMiddleware

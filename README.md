@@ -3,6 +3,85 @@
 **Nexa Wallet** is an **Account Abstraction (AA)** smart wallet built to make crypto management simple, secure, and intuitive.
 It combines an **AI Agent**, **real-time token prices from Pyth Network**, and a clean modern interface for sending, receiving, and swapping assets.
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 20
+- npm >= 9 (or yarn)
+- Python >= 3.11
+- Access to an Ethereum RPC (e.g., Alchemy, Infura)
+- Backend environment variables (`.env`) setup
+
+### Frontend Setup
+
+1. Navigate to the frontend folder:
+
+```bash
+cd frontend
+````
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start development server:
+
+```bash
+npm run dev
+```
+
+4. For production build:
+
+```bash
+npm run build
+npm start
+```
+
+### Backend Setup
+
+1. Navigate to the backend folder:
+
+```bash
+cd backend
+```
+
+2. Copy `.env.example` to `.env` and fill in your keys:
+
+```
+SENDER_ADDRESS=0x...
+BACKEND_PRIVATE_KEY=your_private_key
+RPC_URL=https://eth-sepolia.infura.io/v3/YOUR_KEY
+CHAIN_ID=11155111
+ALLOWED_ORIGINS=http://localhost:3000
+```
+
+3. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Start the backend server:
+
+```bash
+python app.py
+```
+
+5. Start the Ai agent:
+
+``bash
+uvicorn app:app --port 8001 --reload
+```
+
+6. Start the Mongodb:
+
+```bash
+sudo systemctl status mongod
+```
+
 ## Key Features
 
 ### 1. Account Abstraction Smart Wallet

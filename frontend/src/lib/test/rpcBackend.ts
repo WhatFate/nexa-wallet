@@ -57,7 +57,6 @@ export const getProvider = async () =>
   new ethers.providers.JsonRpcProvider(await getConfigValue("rpc_url"));
 
 export const getRpcUrl = () => getConfigValue("rpc_url");
-export const getApiKey = () => getConfigValue("api_key");
 export const getEntryPoint = () => getConfigValue("entry_point");
 export const getPrivateKey = () => getConfigValue("private_key");
 export const getSwapRouter = () => getConfigValue("swap_router");
