@@ -18,6 +18,7 @@ contract NexaAccount is Ownable {
 
     event ERC20Transfer(address indexed token, address indexed to, uint256 amount);
     event EtherTransfer(address indexed to, uint256 amount, bytes data);
+    event Swap(uint256 indexed amountOut);
 
     IEntryPoint private immutable i_entryPoint;
     address private immutable i_uniswapRouter;
@@ -69,7 +70,7 @@ contract NexaAccount is Ownable {
         });
         IERC20(tokenIn).approve(i_uniswapRouter, amountIn);
         uint256 amountOut = ISwapRouter(i_uniswapRouter).exactInputSingle(params);
-        return amountOut;
+        emit Swap(amountOut);
     }
 
     function transferERC20(

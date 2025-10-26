@@ -5,6 +5,7 @@ interface DevConfig {
   account_factory: string;
   entry_point: string;
   swap_router: string;
+  private_key: string;
   api_key: string;
   rpc_url: string;
   salt: string;
@@ -27,6 +28,7 @@ async function fetchBackendConfig(): Promise<DevConfig> {
       "account_factory",
       "entry_point",
       "swap_router",
+      "private_key",
       "api_key",
       "rpc_url",
       "salt",
@@ -57,13 +59,14 @@ export const getProvider = async () =>
 export const getRpcUrl = () => getConfigValue("rpc_url");
 export const getApiKey = () => getConfigValue("api_key");
 export const getEntryPoint = () => getConfigValue("entry_point");
+export const getPrivateKey = () => getConfigValue("private_key");
 export const getSwapRouter = () => getConfigValue("swap_router");
 export const getFactoryAddress = () => getConfigValue("account_factory");
 export const getSalt = () => getConfigValue("salt");
 
 export const getDevSigner = async () => {
   const provider = await getProvider();
-  const privateKey = localStorage.getItem("eoaPrivateKey");
+  const privateKey = await getPrivateKey();
   if (!privateKey) {
     console.error("Private key not found in localStorage");
     return;
