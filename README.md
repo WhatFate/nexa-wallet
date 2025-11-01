@@ -61,7 +61,7 @@ Nexa Wallet consists of several key components that work together to provide a s
 
 This architecture separates concerns cleanly: the **frontend** handles sensitive key material and UI, the **backend** manages AI and user metadata, and the **smart contracts** manage on-chain state.
 
-## 🖥️ Interface Preview
+## Interface Preview
 
 ### 1. Dashboard
 Shows the screen before the user has registered a wallet. The user asks a question to the AI assistant in the bottom-right corner, and receives an immediate helpful response.
