@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { get } from "http";
 
 interface DevConfig {
   account_factory: string;
@@ -29,7 +28,6 @@ async function fetchBackendConfig(): Promise<DevConfig> {
       "entry_point",
       "swap_router",
       "private_key",
-      "api_key",
       "rpc_url",
       "salt",
     ];
